@@ -7,33 +7,84 @@
 body { font-family: Arial, sans-serif; background:#fef3c7; text-align:center; padding:30px; }
 .letter {
   display:inline-block;
-  background:white;
-  padding:20px;
-  margin:15px;
-  border:2px solid #f59e0b;
-  border-radius:10px;
-  cursor:pointer;
   width:200px;
+  height:120px;
+  margin:20px;
+  position:relative;
+  cursor:pointer;
+  perspective:600px;
 }
-.content { display:none; margin-top:15px; }
+.letter .envelope {
+  width:100%;
+  height:100%;
+  background:#fff;
+  border:2px solid #f59e0b;
+  border-radius:8px;
+  position:absolute;
+  top:0; left:0;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+.letter.open .envelope {
+  transform: rotateX(180deg);
+}
+.letter .front, .letter .back {
+  position:absolute;
+  width:100%;
+  height:100%;
+  backface-visibility:hidden;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  font-size:16px;
+}
+.letter .front {
+  background:#fff;
+  border:2px solid #f59e0b;
+}
+.letter .back {
+  background:#fef3c7;
+  transform:rotateX(180deg);
+  padding:10px;
+  box-sizing:border-box;
+  font-size:14px;
+  color:#000;
+  text-align:left;
+}
 a { display:block; margin-top:30px; }
 </style>
 </head>
 <body>
 <h1>📜 Briefe für dich</h1>
 
-<!-- Hier stehen die Briefe wirklich als HTML -->
-<div class="letter">Brief 1
-  <div class="content">💜 Du bist der Beste!</div>
+<div class="letter">
+  <div class="envelope">
+    <div class="front">Brief 1</div>
+    <div class="back">💜 Du bist der Beste!</div>
+  </div>
 </div>
-<div class="letter">Brief 2
-  <div class="content">😂 Danke für all unsere Memes!</div>
+
+<div class="letter">
+  <div class="envelope">
+    <div class="front">Brief 2</div>
+    <div class="back">😂 Danke für all unsere Memes!</div>
+  </div>
 </div>
-<div class="letter">Brief 3
-  <div class="content">🫶 Ohne dich wäre vieles halb so lustig.</div>
+
+<div class="letter">
+  <div class="envelope">
+    <div class="front">Brief 3</div>
+    <div class="back">🫶 Ohne dich wäre vieles halb so lustig.</div>
+  </div>
 </div>
-<div class="letter">Brief 4
-  <div class="content">⭐ Du machst jeden Tag besser!</div>
+
+<div class="letter">
+  <div class="envelope">
+    <div class="front">Brief 4</div>
+    <div class="back">⭐ Du machst jeden Tag besser!</div>
+  </div>
 </div>
 
 <a href="index.html">⬅️ Zurück</a>
@@ -52,14 +103,11 @@ letters.forEach((el, idx)=>{
   }
 });
 
-// Klick auf Brief zeigt Inhalt
-function toggle(el){
-  const content = el.querySelector(".content");
-  if(content) content.style.display = content.style.display === "block" ? "none" : "block";
-}
-
+// Klick auf Umschlag klappt ihn auf
 letters.forEach(el=>{
-  el.addEventListener("click",()=>toggle(el));
+  el.addEventListener("click", ()=>{
+    el.classList.toggle("open");
+  });
 });
 </script>
 </body>
