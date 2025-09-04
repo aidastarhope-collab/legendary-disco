@@ -1,141 +1,186 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>📜 Briefe für dich</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-:root{
-  --primary:#fff; --bg:#05353d;
-  --env-bg:#f5edd1; --env-tab:#ecdeb8; --env-cover:#e6cfa7;
-  --shadow:rgba(0,0,0,.2); --text:#444; --heart:#fc08e7;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,Segoe UI,Roboto,Inter,sans-serif;text-align:center}
-h1{margin:24px 12px;font-size:clamp(22px,4vw,36px)}
+  :root{
+    --primary:#fff; --bg:#05353d;
+    --env-bg:#f5edd1; --env-tab:#ecdeb8; --env-cover:#e6cfa7;
+    --shadow:rgba(0,0,0,.2); --text:#444; --heart:#fc08e7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,Segoe UI,Roboto,Inter,sans-serif;text-align:center}
+  h1{margin:24px 12px;font-size:clamp(22px,4vw,36px)}
 
-.letters{display:flex;flex-wrap:wrap;gap:32px;justify-content:center;
-         max-width:1040px;margin:36px auto;padding:0 16px}
+  .meta{opacity:.85;margin-top:-8px}
+  .letters{display:flex;flex-wrap:wrap;gap:32px;justify-content:center;
+           max-width:1040px;margin:20px auto 28px;padding:0 16px}
 
-/* Umschlag fix: 300×230 */
-.envelope-wrapper{
-  width:300px;height:230px;background:var(--env-bg);
-  border-radius:12px;padding:10px;box-shadow:0 0 20px var(--shadow);
-  position:relative;cursor:pointer;transition:opacity .25s ease,transform .2s ease;
-}
-.envelope-wrapper.disabled{opacity:.4;pointer-events:none;filter:saturate(.3)}
-.envelope{position:relative;width:100%;height:100%;overflow:hidden;perspective:800px}
+  /* Umschlag fix: 300×230 -> Geometrie bleibt stabil */
+  .envelope-wrapper{
+    width:300px;height:230px;background:var(--env-bg);
+    border-radius:12px;padding:10px;box-shadow:0 0 20px var(--shadow);
+    position:relative;cursor:pointer;transition:opacity .25s ease,transform .2s ease;
+  }
+  .envelope-wrapper.disabled{opacity:.35;pointer-events:none;filter:saturate(.3)}
+  .envelope{position:relative;width:100%;height:100%;overflow:hidden;perspective:900px}
 
-/* Klappe */
-.envelope::before{
-  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
-  border-top:130px solid var(--env-tab);
-  border-right:150px solid transparent;border-left:150px solid transparent;
-  transform-origin:50% 0;
-  transition:transform .55s ease 0s;
-  z-index:3;
-}
-/* Körper */
-.envelope::after{
-  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
-  border-top:130px solid transparent;
-  border-right:150px solid var(--env-cover);
-  border-bottom:100px solid var(--env-cover);
-  border-left:150px solid var(--env-cover);
-  z-index:2;
-}
+  /* Klappe (Pseudo – oben) */
+  .envelope::before{
+    content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+    border-top:130px solid var(--env-tab);
+    border-left:150px solid transparent;border-right:150px solid transparent;
+    transform-origin:50% 0;
+    transition:transform .5s ease;
+    z-index:3;
+  }
+  /* Körper */
+  .envelope::after{
+    content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+    border-top:130px solid transparent;
+    border-left:150px solid var(--env-cover);border-right:150px solid var(--env-cover);
+    border-bottom:100px solid var(--env-cover);
+    z-index:2;
+  }
 
-/* Brief */
-.letter{
-  position:absolute;right:23%;bottom:-10px;width:54%;height:80%;
-  background:var(--primary);color:var(--text);
-  border-radius:6px;padding:12px;box-shadow:0 0 5px var(--shadow);
-  z-index:1;
-  transition:bottom .6s ease .7s, transform .6s ease .7s;
-  display:flex;align-items:flex-start;justify-content:flex-start;overflow:hidden;
-}
-.letter .text{font-size:12px;line-height:1.35;text-align:left}
+  /* Brief (startet unten „drin“) */
+  .letter{
+    position:absolute;right:23%;bottom:-10px;width:54%;height:80%;
+    background:var(--primary);color:var(--text);
+    border-radius:6px;padding:12px;box-shadow:0 0 5px var(--shadow);
+    z-index:1;
+    transition:bottom .6s ease, transform .6s ease;
+    display:flex;align-items:flex-start;justify-content:flex-start;overflow:hidden;
+  }
+  .letter .text{font-size:12px;line-height:1.35;text-align:left}
 
-/* Herz */
-.heart{
-  position:absolute;top:50%;left:50%;
-  width:20px;height:20px;background:var(--heart);
-  transform:translate(-50%,-40%) rotate(45deg);
-  box-shadow:0 1px 6px var(--shadow);
-  transition:transform .4s ease .3s;
-  z-index:4;pointer-events:none;
-}
-.heart:before,.heart:after{
-  content:"";position:absolute;width:20px;height:20px;background:var(--heart);border-radius:50%;
-}
-.heart:before{top:-10px;left:0}
-.heart:after{left:-10px;top:0}
+  /* Herz (korrekt geformt & zentriert) */
+  .heart{
+    position:absolute;top:50%;left:50%;
+    width:20px;height:20px;background:var(--heart);
+    transform:translate(-50%,-40%) rotate(45deg);
+    box-shadow:0 1px 6px var(--shadow);
+    transition:transform .35s ease;
+    z-index:4;pointer-events:none;
+  }
+  .heart:before,.heart:after{
+    content:"";position:absolute;width:20px;height:20px;background:var(--heart);border-radius:50%;
+  }
+  .heart:before{top:-10px;left:0}
+  .heart:after{left:-10px;top:0}
 
-/* Offen-Zustand */
-.envelope-wrapper.flap .envelope{overflow:visible}
-.envelope-wrapper.flap .envelope::before{transform:rotateX(180deg);z-index:0}
-.envelope-wrapper.flap .heart{transform:rotate(90deg);transition-delay:.35s}
-.envelope-wrapper.flap .letter{bottom:90px;transform:scale(1.05)}
+  /* ---------- Schrittweise Öffnen per Klassen ---------- */
 
-.back{display:inline-block;margin:6px auto 32px;padding:10px 18px;background:#0a5c6d;color:#fff;
-      border-radius:10px;text-decoration:none;font-weight:600}
-.back:hover{background:#0d768b}
+  /* Schritt 1: Klappe klappt sofort */
+  .envelope-wrapper.open-step1 .envelope::before{
+    transform:rotateX(180deg);
+    z-index:0;
+  }
+
+  /* Schritt 2: Herz dreht */
+  .envelope-wrapper.open-step2 .heart{
+    transform:rotate(90deg) translate(0,0);
+  }
+
+  /* Schritt 3: Brief fährt zuletzt raus & darf herausragen */
+  .envelope-wrapper.open-step3 .envelope{overflow:visible}
+  .envelope-wrapper.open-step3 .letter{
+    bottom:92px; transform:scale(1.05);
+  }
+
+  .row{
+    display:flex;gap:12px;justify-content:center;align-items:center;
+    max-width:1040px;margin:0 auto 8px; padding:0 16px; opacity:.9; font-size:14px;
+  }
+  .row button{
+    padding:8px 12px;border:0;border-radius:10px;font-weight:600;cursor:pointer;
+  }
+  .row .back{background:#0a5c6d;color:#fff}
+  .row .back:hover{background:#0d768b}
+  .row .reset{background:#f3f4f6}
 </style>
 </head>
 <body>
   <h1>📜 Briefe für dich</h1>
+  <div class="meta" id="meta"></div>
 
-  <div class="letters">
+  <div class="letters" id="letters">
     <!-- 1 -->
     <div class="envelope-wrapper">
       <div class="envelope">
         <div class="letter"><div class="text">💜 Du bist der Beste!</div></div>
-        <div class="heart"></div>
+        <div class="heart" aria-hidden="true"></div>
       </div>
     </div>
     <!-- 2 -->
     <div class="envelope-wrapper">
       <div class="envelope">
         <div class="letter"><div class="text">✨ Danke für alles, was du tust!</div></div>
-        <div class="heart"></div>
+        <div class="heart" aria-hidden="true"></div>
       </div>
     </div>
     <!-- 3 -->
     <div class="envelope-wrapper">
       <div class="envelope">
         <div class="letter"><div class="text">🌙 Ohne dich wäre alles halb so schön.</div></div>
-        <div class="heart"></div>
+        <div class="heart" aria-hidden="true"></div>
       </div>
     </div>
     <!-- 4 -->
     <div class="envelope-wrapper">
       <div class="envelope">
         <div class="letter"><div class="text">⭐ Du machst jeden Tag besser!</div></div>
-        <div class="heart"></div>
+        <div class="heart" aria-hidden="true"></div>
       </div>
     </div>
     <!-- 5 -->
     <div class="envelope-wrapper">
       <div class="envelope">
         <div class="letter"><div class="text">🫶 Ich bin froh, dass es dich gibt!</div></div>
-        <div class="heart"></div>
+        <div class="heart" aria-hidden="true"></div>
       </div>
     </div>
   </div>
 
-  <a href="index.html" class="back">⬅ Zurück</a>
+  <div class="row">
+    <a href="index.html" class="back">⬅ Zurück</a>
+    <button class="reset" id="reset">Score zurücksetzen</button>
+  </div>
 
-  <script>
-    // Score aus Banana-Game (SessionStorage)
-    const score = parseInt(sessionStorage.getItem("bananaScore") || "0");
+<script>
+  // Score aus SessionStorage (jedes Mal neu erspielen)
+  const score = parseInt(sessionStorage.getItem("bananaScore") || "0");
+  const wrappers = Array.from(document.querySelectorAll(".envelope-wrapper"));
+  const meta = document.getElementById("meta");
+  meta.textContent = `Freigeschaltet: ${Math.min(score, wrappers.length)} / ${wrappers.length}`;
 
-    document.querySelectorAll(".envelope-wrapper").forEach((wrap, i) => {
-      if (i < score) {
-        wrap.addEventListener("click", () => wrap.classList.toggle("flap"));
-      } else {
-        wrap.classList.add("disabled");
+  // Freischalten nach Score
+  wrappers.forEach((wrap, i) => {
+    if (i >= score) {
+      wrap.classList.add("disabled");
+      return;
+    }
+    // Klick -> Schrittweise öffnen
+    wrap.addEventListener("click", () => {
+      if (wrap.classList.contains("open-step3")) {
+        // schließen: alles zurücksetzen
+        wrap.classList.remove("open-step1","open-step2","open-step3");
+        return;
       }
+      // Open sequenziell: 1 -> 2 -> 3
+      wrap.classList.add("open-step1");
+      setTimeout(() => wrap.classList.add("open-step2"), 300);  // Herz etwas später
+      setTimeout(() => wrap.classList.add("open-step3"), 700);  // Brief zuletzt
     });
-  </script>
+  });
+
+  // Debug/Komfort: Score zurücksetzen
+  document.getElementById("reset").addEventListener("click", () => {
+    sessionStorage.removeItem("bananaScore");
+    location.reload();
+  });
+</script>
 </body>
 </html>
