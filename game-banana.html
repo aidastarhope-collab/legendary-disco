@@ -1,95 +1,75 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Banana Cat</title>
-  <style>
-    body{background:#fff7ed;text-align:center;font-family:Arial,sans-serif;}
-    canvas{background:#fde68a;border:2px solid #f59e0b;margin-top:20px;}
-    a{display:block;margin-top:20px;}
-    #nextBtn {
-      display:none;
-      margin-top:20px;
-      padding:10px 20px;
-      font-size:16px;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
-      background:#fbbf24;
-      color:#000;
-      font-weight:bold;
-    }
-    #nextBtn:hover { background:#fcd34d; }
-  </style>
+<meta charset="UTF-8">
+<title>Banana Cat</title>
+<style>
+body{background:#fff7ed;text-align:center;font-family:Arial,sans-serif;}
+canvas{background:#fde68a;border:2px solid #f59e0b;margin-top:20px;}
+#nextBtn{display:none;margin-top:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;cursor:pointer;background:#fbbf24;color:#000;font-weight:bold;}
+#nextBtn:hover{background:#fcd34d;}
+</style>
 </head>
 <body>
-  <h1>🍌 Banana Cat fängt Herzen</h1>
-  <canvas id="game" width="400" height="400"></canvas>
-  <button id="nextBtn" onclick="window.location.href='letters.html'">➡️ Weiter zu den Briefen</button>
-  <a href="index.html">⬅️ Zurück</a>
+<h1>🍌 Banana Cat fängt Herzen</h1>
+<canvas id="game" width="400" height="400"></canvas>
+<button id="nextBtn" onclick="window.location.href='letters.html'">➡️ Weiter zu den Briefen</button>
+<a href="index.html">⬅️ Zurück</a>
 
-  <script>
-    const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
-    const player={x:180,y:360,w:40,h:20};
-    let hearts=[],score=0, gameOver=false;
-    let timeLeft = 20; // Sekunden Spielzeit
-    const nextBtn=document.getElementById("nextBtn");
+<script>
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+const player={x:180,y:360,w:40,h:20};
+let hearts=[],score=0,gameOver=false;
+let timeLeft=20;
+const nextBtn=document.getElementById("nextBtn");
 
-    function spawnHeart(){
-      if(!gameOver) hearts.push({x:Math.random()*360,y:0});
-    }
-    function draw(){
-      ctx.clearRect(0,0,400,400);
-      ctx.fillStyle="yellow";ctx.fillRect(player.x,player.y,player.w,player.h);
+function spawnHeart(){if(!gameOver) hearts.push({x:Math.random()*360,y:0});}
 
-      ctx.fillStyle="red";
-      hearts.forEach(h=>ctx.fillText("❤️",h.x,h.y));
+function draw(){
+  ctx.clearRect(0,0,400,400);
+  ctx.fillStyle="yellow"; ctx.fillRect(player.x,player.y,player.w,player.h);
+  ctx.fillStyle="red";
+  hearts.forEach(h=>ctx.fillText("❤️",h.x,h.y));
+  ctx.fillStyle="black"; ctx.font="16px Arial";
+  ctx.fillText("Score: "+score,10,20);
+  ctx.fillText("Zeit: "+timeLeft+"s",320,20);
+  if(gameOver){
+    ctx.fillStyle="black"; ctx.font="24px Arial";
+    ctx.fillText("⏳ Zeit abgelaufen!",100,200);
+    ctx.fillText("Endscore: "+score,120,240);
+  }
+}
 
-      ctx.fillStyle="black";
-      ctx.font="16px Arial";
-      ctx.fillText("Score: "+score,10,20);
-      ctx.fillText("Zeit: "+timeLeft+"s",320,20);
+function update(){
+  if(gameOver) return;
+  hearts.forEach(h=>h.y+=2);
+  hearts=hearts.filter(h=>{
+    if(h.y>400) return false;
+    if(h.x>player.x && h.x<player.x+player.w && h.y>player.y){score++; return false;}
+    return true;
+  });
+}
 
-      if(gameOver){
-        ctx.fillStyle="black";
-        ctx.font="24px Arial";
-        ctx.fillText("⏳ Zeit abgelaufen!", 100,200);
-        ctx.fillText("Endscore: "+score, 120,240);
-      }
-    }
-    function update(){
-      if(gameOver) return;
-      hearts.forEach(h=>h.y+=2);
-      hearts=hearts.filter(h=>{
-        if(h.y>400)return false;
-        if(h.x>player.x&&h.x<player.x+player.w&&h.y>player.y){score++;return false;}
-        return true;
-      });
-    }
-    function loop(){update();draw();requestAnimationFrame(loop);}
+function loop(){update();draw();requestAnimationFrame(loop);}
 
-    document.addEventListener("keydown",e=>{
-      if(e.key==="ArrowLeft")player.x=Math.max(0,player.x-20);
-      if(e.key==="ArrowRight")player.x=Math.min(360,player.x+20);
-    });
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft") player.x=Math.max(0,player.x-20);
+  if(e.key==="ArrowRight") player.x=Math.min(360,player.x+20);
+});
 
-    // Timer runterzählen
-    let timer = setInterval(()=>{
-      if(timeLeft>0){
-        timeLeft--;
-      } else {
-        gameOver = true;
-        clearInterval(timer);
-        // Score speichern
-        sessionStorage.setItem("bananaScore", score);
-        // Button anzeigen
-        nextBtn.style.display="inline-block";
-      }
-    },1000);
+// Timer
+let timer=setInterval(()=>{
+  if(timeLeft>0){timeLeft--;}
+  else{
+    gameOver=true;
+    clearInterval(timer);
+    sessionStorage.setItem("bananaScore", score);
+    nextBtn.style.display="inline-block";
+  }
+},1000);
 
-    setInterval(spawnHeart,1000); 
-    loop();
-  </script>
+setInterval(spawnHeart,1000);
+loop();
+</script>
 </body>
 </html>
-
