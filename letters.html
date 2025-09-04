@@ -5,7 +5,16 @@
 <title>Briefe 💌</title>
 <style>
 body { font-family: Arial, sans-serif; background:#fef3c7; text-align:center; padding:30px; }
-.letter { display:inline-block; background:white; padding:20px; margin:15px; border:2px solid #f59e0b; border-radius:10px; cursor:pointer; width:200px; }
+.letter {
+  display:inline-block;
+  background:white;
+  padding:20px;
+  margin:15px;
+  border:2px solid #f59e0b;
+  border-radius:10px;
+  cursor:pointer;
+  width:200px;
+}
 .content { display:none; margin-top:15px; }
 a { display:block; margin-top:30px; }
 </style>
@@ -13,6 +22,7 @@ a { display:block; margin-top:30px; }
 <body>
 <h1>📜 Briefe für dich</h1>
 
+<!-- Hier stehen die Briefe wirklich als HTML -->
 <div class="letter">Brief 1
   <div class="content">💜 Du bist der Beste!</div>
 </div>
@@ -29,9 +39,11 @@ a { display:block; margin-top:30px; }
 <a href="index.html">⬅️ Zurück</a>
 
 <script>
+// Score aus Banana Game holen
 let unlocked = sessionStorage.getItem("bananaScore") || 0;
 unlocked = parseInt(unlocked);
 
+// Briefe freischalten oder sperren
 const letters = document.querySelectorAll(".letter");
 letters.forEach((el, idx)=>{
   if(idx >= unlocked){
@@ -40,12 +52,15 @@ letters.forEach((el, idx)=>{
   }
 });
 
+// Klick auf Brief zeigt Inhalt
 function toggle(el){
   const content = el.querySelector(".content");
   if(content) content.style.display = content.style.display === "block" ? "none" : "block";
 }
 
-letters.forEach(el=>el.addEventListener("click",()=>toggle(el)));
+letters.forEach(el=>{
+  el.addEventListener("click",()=>toggle(el));
+});
 </script>
 </body>
 </html>
