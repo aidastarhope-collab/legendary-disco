@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Clicker</title>
+  <style>
+    body { font-family: sans-serif; text-align:center; background:#fce7f3; }
+    button{padding:20px 40px;font-size:20px;border:none;border-radius:10px;cursor:pointer;}
+    a{display:block;margin-top:20px;}
+  </style>
+</head>
+<body>
+  <h1>🖱️ Clicker</h1>
+  <p>Klick 20 Mal für eine Überraschung!</p>
+  <button id="btn">Klick mich</button>
+  <p id="count">0</p>
+  <div id="msg"></div>
+  <a href="index.html">⬅️ Zurück</a>
+
+  <script>
+    let count=0,btn=document.getElementById("btn"),c=document.getElementById("count"),msg=document.getElementById("msg");
+    btn.onclick=()=>{
+      count++; c.textContent=count;
+      if(count===20) msg.textContent="🎉 Gratuliere! Du hast die Überraschung freigeklickt 💜";
+    }
+  </script>
+</body>
+</html>
