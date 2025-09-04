@@ -1,47 +1,38 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <title>Banana Cat</title>
-  <style>
-    body{background:#fff7ed;text-align:center;}
-    canvas{background:#fde68a;border:2px solid #f59e0b;margin-top:20px;}
-    a{display:block;margin-top:20px;}
-  </style>
-</head>
-<body>
-  <h1>🍌 Banana Cat fängt Herzen</h1>
-  <canvas id="game" width="400" height="400"></canvas>
-  <a href="index.html">⬅️ Zurück</a>
+<script>
+  const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+  const player={x:180,y:360,w:40,h:20};
+  let hearts=[],score=0;
 
-  <script>
-    const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
-    const player={x:180,y:360,w:40,h:20};
-    let hearts=[],score=0;
-    function spawnHeart(){
-      hearts.push({x:Math.random()*360,y:0});
-    }
-    function draw(){
-      ctx.clearRect(0,0,400,400);
-      ctx.fillStyle="yellow";ctx.fillRect(player.x,player.y,player.w,player.h);
-      ctx.fillStyle="red";
-      hearts.forEach(h=>ctx.fillText("❤️",h.x,h.y));
-      ctx.fillStyle="black";ctx.fillText("Score: "+score,10,20);
-    }
-    function update(){
-      hearts.forEach(h=>h.y+=2);
-      hearts=hearts.filter(h=>{
-        if(h.y>400)return false;
-        if(h.x>player.x&&h.x<player.x+player.w&&h.y>player.y){score++;return false;}
-        return true;
-      });
-    }
-    function loop(){update();draw();requestAnimationFrame(loop);}
-    document.addEventListener("keydown",e=>{
-      if(e.key==="ArrowLeft")player.x=Math.max(0,player.x-20);
-      if(e.key==="ArrowRight")player.x=Math.min(360,player.x+20);
+  function spawnHeart(){
+    hearts.push({x:Math.random()*360,y:0});
+  }
+  function draw(){
+    ctx.clearRect(0,0,400,400);
+    ctx.fillStyle="yellow";ctx.fillRect(player.x,player.y,player.w,player.h);
+    ctx.fillStyle="red";
+    hearts.forEach(h=>ctx.fillText("❤️",h.x,h.y));
+    ctx.fillStyle="black";ctx.fillText("Score: "+score,10,20);
+  }
+  function update(){
+    hearts.forEach(h=>h.y+=2);
+    hearts=hearts.filter(h=>{
+      if(h.y>400)return false;
+      if(h.x>player.x&&h.x<player.x+player.w&&h.y>player.y){score++;return false;}
+      return true;
     });
-    setInterval(spawnHeart,1000); loop();
-  </script>
-</body>
-</html>
+  }
+  function loop(){update();draw();requestAnimationFrame(loop);}
+
+  document.addEventListener("keydown",e=>{
+    if(e.key==="ArrowLeft")player.x=Math.max(0,player.x-20);
+    if(e.key==="ArrowRight")player.x=Math.min(360,player.x+20);
+  });
+
+  // Save score when leaving page
+  window.addEventListener("beforeunload", ()=>{
+    localStorage.setItem("bananaScore", score);
+  });
+
+  setInterval(spawnHeart,1000); 
+  loop();
+</script>
