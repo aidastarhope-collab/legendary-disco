@@ -5,84 +5,82 @@
 <title>📜 Briefe für dich</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  :root{
-    --primary:#fff;
-    --bg:#05353d;
-    --env-bg:#f5edd1;
-    --env-tab:#ecdeb8;
-    --env-cover:#e6cfa7;
-    --shadow:rgba(0,0,0,.2);
-    --text:#444;
-    --heart:#fc08e7;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,Segoe UI,Roboto,Inter,sans-serif;text-align:center}
-  h1{margin:24px 12px;font-size:clamp(22px,4vw,36px)}
-  .letters{
-    display:flex; flex-wrap:wrap; gap:32px; justify-content:center;
-    max-width:1040px; margin:36px auto 28px; padding:0 16px;
-  }
+:root{
+  --primary:#fff; --bg:#05353d;
+  --env-bg:#f5edd1; --env-tab:#ecdeb8; --env-cover:#e6cfa7;
+  --shadow:rgba(0,0,0,.2); --text:#444; --heart:#fc08e7;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,Segoe UI,Roboto,Inter,sans-serif;text-align:center}
+h1{margin:24px 12px;font-size:clamp(22px,4vw,36px)}
+.letters{display:flex;flex-wrap:wrap;gap:32px;justify-content:center;max-width:1040px;margin:36px auto 28px;padding:0 16px}
 
-  /* Fixe Maße für saubere Klappen-Geometrie */
-  .envelope-wrapper{
-    width:300px; height:230px;
-    background:var(--env-bg);
-    border-radius:12px; padding:10px; box-shadow:0 0 20px var(--shadow);
-    position:relative; cursor:pointer; transition:opacity .25s ease, transform .2s ease;
-  }
-  .envelope-wrapper.disabled{opacity:.4; pointer-events:none; filter:saturate(.3)}
-  .envelope{position:relative; width:100%; height:100%; overflow:hidden;} /* Brief verborgen */
+/* Umschlag fix: 300×230 */
+.envelope-wrapper{
+  width:300px;height:230px;background:var(--env-bg);
+  border-radius:12px;padding:10px;box-shadow:0 0 20px var(--shadow);
+  position:relative;cursor:pointer;transition:opacity .25s ease,transform .2s ease;
+}
+.envelope-wrapper.disabled{opacity:.4;pointer-events:none;filter:saturate(.3)}
 
-  /* Klappe */
-  .envelope::before{
-    content:""; position:absolute; top:0; left:50%; transform:translateX(-50%);
-    z-index:3;
-    border-top:130px solid var(--env-tab);
-    border-right:150px solid transparent;
-    border-left:150px solid transparent;
-    transform-origin:top;
-    transition:transform .5s ease-in-out; /* keine Verzögerung -> zuerst klappen */
-  }
-  /* Körper */
-  .envelope::after{
-    content:""; position:absolute; left:50%; top:0; transform:translateX(-50%);
-    z-index:2; width:0; height:0;
-    border-top:130px solid transparent;
-    border-right:150px solid var(--env-cover);
-    border-bottom:100px solid var(--env-cover);
-    border-left:150px solid var(--env-cover);
-  }
+/* Der eigentliche Umschlag */
+.envelope{
+  position:relative;width:100%;height:100%;
+  overflow:hidden;               /* Brief bleibt versteckt bis open */
+  perspective:900px;             /* stabilisiert den Klapp-Flip */
+}
 
-  /* Brief – startet versteckt im Umschlag */
-  .letter{
-    position:absolute; right:23%; bottom:-10px;
-    width:54%; height:80%;
-    background:var(--primary); color:var(--text);
-    border-radius:6px; padding:12px; box-shadow:0 0 5px var(--shadow);
-    z-index:1; transition:all 1s ease-in-out; /* Bewegung kommt nach der Klappe */
-    display:flex; align-items:flex-start; justify-content:flex-start; overflow:hidden;
-  }
-  .letter .text{font-size:12px; line-height:1.35; text-align:left}
+/* Klappe (oben) – keine Verzögerung -> startet zuerst */
+.envelope::before{
+  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+  z-index:3;
+  border-top:130px solid var(--env-tab);
+  border-right:150px solid transparent;
+  border-left:150px solid transparent;
+  transform-origin:50% 0;        /* oben-mittig */
+  transition:transform .55s ease-in-out 0s; /* sofort */
+  will-change:transform;
+}
+/* Körper */
+.envelope::after{
+  content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);
+  z-index:2;width:0;height:0;
+  border-top:130px solid transparent;
+  border-right:150px solid var(--env-cover);
+  border-bottom:100px solid var(--env-cover);
+  border-left:150px solid var(--env-cover);
+}
 
-  /* Herz – korrekt geformt */
-  .heart{
-    position:absolute; top:50%; left:50%;
-    width:20px; height:20px; background:var(--heart);
-    transform:translate(-50%,-35%) rotate(45deg);
-    transition:transform .4s ease-in-out .2s; /* leicht versetzt nach der Klappe */
-    box-shadow:0 1px 6px var(--shadow); z-index:4; pointer-events:none;
-  }
-  .heart:before,.heart:after{
-    content:""; position:absolute; width:20px; height:20px; background:var(--heart); border-radius:50%;
-  }
-  .heart:before{ top:-10px; left:0; }  /* obere Rundung */
-  .heart:after{  left:-10px; top:0; }  /* linke Rundung */
+/* Brief – startet im Umschlag */
+.letter{
+  position:absolute;right:23%;bottom:-10px;width:54%;height:80%;
+  background:var(--primary);color:var(--text);
+  border-radius:6px;padding:12px;box-shadow:0 0 5px var(--shadow);
+  z-index:1;transition:bottom .65s ease-out .7s, transform .65s ease-out .7s; /* startet zuletzt */
+  display:flex;align-items:flex-start;justify-content:flex-start;overflow:hidden;
+}
+.letter .text{font-size:12px;line-height:1.35;text-align:left}
 
-  /* Öffnen: Reihenfolge fixiert */
-  .envelope-wrapper.flap .envelope{overflow:visible;} /* Brief darf herausragen */
-  .envelope-wrapper.flap .envelope::before{transform:rotateX(180deg); z-index:0;}
-  .envelope-wrapper.flap .letter{bottom:88px; transform:scale(1.05); transition-delay:.25s;} /* fährt NACH der Klappe */
-  .envelope-wrapper.flap .heart{transform:rotate(90deg) translate(0,0); transition-delay:.15s;}
+/* Herz – korrekt geformt und leicht verzögert nach Klappe */
+.heart{
+  position:absolute;top:50%;left:50%;
+  width:20px;height:20px;background:var(--heart);
+  transform:translate(-50%,-35%) rotate(45deg);
+  transition:transform .4s ease-in-out .2s; /* nach Klappe */
+  box-shadow:0 1px 6px var(--shadow);z-index:4;pointer-events:none;
+}
+.heart:before,.heart:after{
+  content:"";position:absolute;width:20px;height:20px;background:var(--heart);border-radius:50%;
+}
+.heart:before{top:-10px;left:0}  /* obere Rundung */
+.heart:after{left:-10px;top:0}   /* linke Rundung */
+
+/* Öffnen – Reihenfolge fixiert */
+.envelope-wrapper.flap .envelope{overflow:visible} /* Brief darf raus */
+.envelope-wrapper.flap .envelope::before{transform:rotateX(180deg);z-index:0}
+.envelope-wrapper.flap .heart{transform:rotate(90deg) translate(0,0);transition-delay:.35s}
+.envelope-wrapper.flap .letter{bottom:92px;transform:scale(1.05)}  /* startet durch die oben gesetzte .7s Verzögerung */
+
 
   .back{display:inline-block;margin:6px auto 32px;padding:10px 18px;background:#0a5c6d;color:#fff;
         border-radius:10px;text-decoration:none;font-weight:600}
@@ -147,3 +145,4 @@
   </script>
 </body>
 </html>
+
