@@ -5,209 +5,199 @@
 <title>📜 Briefe für dich</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-/* ==== Vollständig gekapselt im #letters-app Scope ==== */
-#letters-app{
-  --bg:#05353d;
-  --panel:#e6cfa7;
-  --flap:#ecdeb8;
-  --wrap:#f5edd1;
-  --paper:#ffffff;
-  --text:#444;
-  --heart:#fc08e7;
-  --shadow:rgba(0,0,0,.2);
-  --w:300px;      /* Umschlagbreite */
-  --h:230px;      /* Umschlaghöhe  */
-}
+  :root{
+    --bg:#05353d;
+    --wrap:#f5edd1;
+    --panel:#e6cfa7;
+    --flap:#ecdeb8;
+    --paper:#ffffff;
+    --text:#444;
+    --heart:#fc08e7;
+    --shadow:rgba(0,0,0,.2);
+    --W:300px;    /* Umschlagbreite */
+    --H:230px;    /* Umschlaghöhe  */
+  }
 
-#letters-app *{box-sizing:border-box}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:#fff;
+       font-family:system-ui,Segoe UI,Roboto,Inter,sans-serif;text-align:center}
+  h1{margin:24px 12px;font-size:clamp(22px,4vw,36px)}
+  .meta{opacity:.85;margin-top:-8px}
 
-body{margin:0;background:#05353d;font-family:system-ui,Segoe UI,Roboto,Inter,sans-serif;color:#fff;text-align:center}
-h1{margin:24px 12px;font-size:clamp(22px,4vw,36px)}
-#letters-app .meta{opacity:.85;margin-top:-8px}
+  .list{
+    display:flex;flex-wrap:wrap;gap:32px;justify-content:center;
+    max-width:1040px;margin:20px auto 28px;padding:0 16px
+  }
 
-/* Layout */
-#letters-app .list{
-  display:flex;flex-wrap:wrap;gap:32px;justify-content:center;
-  max-width:1040px;margin:20px auto 28px;padding:0 16px
-}
+  /* Umschlagrahmen – fixe Maße, damit nichts schief klappt */
+  .env{
+    width:var(--W); height:var(--H);
+    background:var(--wrap);
+    border-radius:12px; padding:10px;
+    box-shadow:0 0 20px var(--shadow);
+    position:relative; cursor:pointer;
+    transition:opacity .25s ease, transform .2s ease;
+  }
+  .env.disabled{opacity:.35;pointer-events:none;filter:saturate(.3)}
 
-/* Umschlag-Wrapper (fixe Maße -> keine schiefe Klappe) */
-#letters-app .env{
-  width:var(--w);height:var(--h);
-  background:var(--wrap);
-  border-radius:12px;padding:10px;box-shadow:0 0 20px var(--shadow);
-  position:relative;cursor:pointer;transition:opacity .25s ease, transform .2s ease;
-}
-#letters-app .env.disabled{opacity:.35;pointer-events:none;filter:saturate(.3)}
+  /* Innenleben: wir arbeiten mit echten Elementen, kein ::before/::after für die Klappe */
+  .inner{
+    position:relative; width:100%; height:100%;
+    overflow:hidden;                 /* Brief bleibt versteckt, bis Step 3 */
+    perspective:900px;               /* stabilisiert Flip der Klappe */
+  }
 
-/* Innenleben */
-#letters-app .inner{
-  position:relative;width:100%;height:100%;
-  overflow:hidden;                /* Brief bleibt verborgen */
-  perspective:900px;              /* stabilisiert Flip */
-}
+  /* Körper: einfaches Rechteck mit abgerundeten Ecken */
+  .panel{
+    position:absolute; inset:0; z-index:1;
+    background:var(--panel);
+    border-radius:8px;
+  }
 
-/* Körper als echtes Element (ohne Pseudo) */
-#letters-app .panel{
-  position:absolute;inset:0;z-index:1;
-  /* wir bauen den „Körper“ aus 3 Dreiecken per Borders */
-}
-#letters-app .panel::before{
-  /* großes unteres Dreieck */
-  content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);
-  border-top:130px solid transparent;
-  border-left:150px solid var(--panel);
-  border-right:150px solid var(--panel);
-  border-bottom:100px solid var(--panel);
-}
+  /* Klappe als Dreieck via clip-path (kein Border-Hack) */
+  .flap{
+    position:absolute; top:0; left:0; right:0; height:65%;
+    background:var(--flap);
+    clip-path:polygon(50% 0%, 100% 100%, 0% 100%);
+    transform-origin:50% 0;                  /* oben mittig */
+    transform:rotateX(0deg);
+    transition:transform .5s ease;           /* Step 1: startet sofort */
+    z-index:3;
+    will-change:transform;
+  }
 
-/* Deckel/Flap als ECHTES Element (kein ::before) */
-#letters-app .flap{
-  position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:0;height:0;z-index:3;
-  border-top:130px solid var(--flap);
-  border-left:150px solid transparent;border-right:150px solid transparent;
-  transform-origin:50% 0;
-  transition:transform .5s ease;       /* Schritt 1: sofort */
-  will-change:transform;
-}
+  /* Herz in der Mitte */
+  .heart{
+    position:absolute; top:50%; left:50%;
+    width:22px; height:22px; background:var(--heart);
+    transform:translate(-50%,-35%) rotate(45deg);
+    transition:transform .35s ease;          /* Step 2 */
+    box-shadow:0 1px 6px var(--shadow);
+    z-index:4; pointer-events:none;
+  }
+  .heart::before,.heart::after{
+    content:""; position:absolute; width:22px; height:22px;
+    background:var(--heart); border-radius:50%;
+  }
+  .heart::before{ top:-11px; left:0; }
+  .heart::after{  left:-11px; top:0; }
 
-/* Brief (Papier) */
-#letters-app .letter{
-  position:absolute;right:23%;bottom:-10px;width:54%;height:80%;
-  background:var(--paper);color:var(--text);
-  border-radius:6px;padding:12px;box-shadow:0 0 5px var(--shadow);
-  z-index:0;                         /* unter der Flap, über Grundfläche */
-  display:flex;align-items:flex-start;justify-content:flex-start;overflow:hidden;
-  transition:bottom .6s ease, transform .6s ease; /* Schritt 3: später (per Klasse) */
-}
-#letters-app .text{font-size:12px;line-height:1.35;text-align:left}
+  /* Brief – wird per translateY bewegt (robuster als bottom) */
+  .letter{
+    position:absolute; left:50%; bottom:10px;
+    width:54%; height:80%;
+    transform:translate(-50%, 65%);          /* Start: im Umschlag versteckt */
+    background:var(--paper); color:var(--text);
+    border-radius:8px; padding:12px;
+    box-shadow:0 0 5px var(--shadow);
+    z-index:2;
+    display:flex; align-items:flex-start; justify-content:flex-start; overflow:hidden;
+    transition:transform .65s ease;          /* Step 3: wird später ausgelöst */
+  }
+  .letter .text{font-size:12px; line-height:1.35; text-align:left}
 
-/* Herz – echtes Element, in der Mitte der Klappe */
-#letters-app .heart{
-  position:absolute;top:50%;left:50%;
-  width:20px;height:20px;background:var(--heart);
-  transform:translate(-50%,-40%) rotate(45deg);
-  box-shadow:0 1px 6px var(--shadow);
-  transition:transform .35s ease;   /* Schritt 2 */
-  z-index:4;pointer-events:none;
-}
-#letters-app .heart::before,#letters-app .heart::after{
-  content:"";position:absolute;width:20px;height:20px;background:var(--heart);border-radius:50%;
-}
-#letters-app .heart::before{top:-10px;left:0}
-#letters-app .heart::after{left:-10px;top:0}
+  /* ---------- Schritt-Klassen erzwingen Reihenfolge ---------- */
+  /* Step 1: Klappe klappt auf */
+  .env.open-s1 .flap{ transform:rotateX(180deg); }
 
-/* ---------- Sequenz per Schritt-Klassen ---------- */
-/* Step 1: Klappe klappt */
-#letters-app .env.open-step1 .flap{
-  transform:translateX(-50%) rotateX(180deg);
-}
-/* Step 2: Herz dreht */
-#letters-app .env.open-step2 .heart{
-  transform:rotate(90deg) translate(0,0);
-}
-/* Step 3: Brief fährt raus + darf herausragen */
-#letters-app .env.open-step3 .inner{overflow:visible}
-#letters-app .env.open-step3 .letter{
-  bottom:92px; transform:scale(1.05);
-}
+  /* Step 2: Herz dreht */
+  .env.open-s2 .heart{ transform:rotate(90deg) translate(0,0); }
 
-/* Buttons */
-#letters-app .row{
-  display:flex;gap:12px;justify-content:center;align-items:center;
-  max-width:1040px;margin:0 auto 8px; padding:0 16px; opacity:.9; font-size:14px;
-}
-#letters-app .row a,#letters-app .row button{
-  padding:10px 14px;border:0;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none
-}
-#letters-app .row .back{background:#0a5c6d;color:#fff}
-#letters-app .row .back:hover{background:#0d768b}
-#letters-app .row .reset{background:#f3f4f6;color:#111}
+  /* Step 3: Brief raus + darf herausragen */
+  .env.open-s3 .inner{ overflow:visible; }
+  .env.open-s3 .letter{ transform:translate(-50%, -55%); } /* fährt sauber nach oben heraus */
+
+  /* Buttons */
+  .row{
+    display:flex;gap:12px;justify-content:center;align-items:center;
+    max-width:1040px;margin:0 auto 8px; padding:0 16px; opacity:.9; font-size:14px;
+  }
+  .row a,.row button{
+    padding:10px 14px;border:0;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none
+  }
+  .back{background:#0a5c6d;color:#fff}
+  .back:hover{background:#0d768b}
+  .reset{background:#f3f4f6;color:#111}
 </style>
 </head>
 <body>
   <h1>📜 Briefe für dich</h1>
+  <div class="meta" id="meta"></div>
 
-  <div id="letters-app">
-    <div class="meta" id="meta"></div>
-
-    <div class="list" id="list">
-      <!-- 1 -->
-      <div class="env">
-        <div class="inner">
-          <div class="panel"></div>
-          <div class="flap"></div>
-          <div class="letter"><div class="text">💜 Du bist der Beste!</div></div>
-          <div class="heart" aria-hidden="true"></div>
-        </div>
-      </div>
-      <!-- 2 -->
-      <div class="env">
-        <div class="inner">
-          <div class="panel"></div>
-          <div class="flap"></div>
-          <div class="letter"><div class="text">✨ Danke für alles, was du tust!</div></div>
-          <div class="heart" aria-hidden="true"></div>
-        </div>
-      </div>
-      <!-- 3 -->
-      <div class="env">
-        <div class="inner">
-          <div class="panel"></div>
-          <div class="flap"></div>
-          <div class="letter"><div class="text">🌙 Ohne dich wäre alles halb so schön.</div></div>
-          <div class="heart" aria-hidden="true"></div>
-        </div>
-      </div>
-      <!-- 4 -->
-      <div class="env">
-        <div class="inner">
-          <div class="panel"></div>
-          <div class="flap"></div>
-          <div class="letter"><div class="text">⭐ Du machst jeden Tag besser!</div></div>
-          <div class="heart" aria-hidden="true"></div>
-        </div>
-      </div>
-      <!-- 5 -->
-      <div class="env">
-        <div class="inner">
-          <div class="panel"></div>
-          <div class="flap"></div>
-          <div class="letter"><div class="text">🫶 Ich bin froh, dass es dich gibt!</div></div>
-          <div class="heart" aria-hidden="true"></div>
-        </div>
+  <div class="list" id="list">
+    <!-- 1 -->
+    <div class="env">
+      <div class="inner">
+        <div class="panel"></div>
+        <div class="flap"></div>
+        <div class="letter"><div class="text">💜 Du bist der Beste!</div></div>
+        <div class="heart" aria-hidden="true"></div>
       </div>
     </div>
-
-    <div class="row">
-      <a href="index.html" class="back">⬅ Zurück</a>
-      <button class="reset" id="reset">Score zurücksetzen</button>
+    <!-- 2 -->
+    <div class="env">
+      <div class="inner">
+        <div class="panel"></div>
+        <div class="flap"></div>
+        <div class="letter"><div class="text">✨ Danke für alles, was du tust!</div></div>
+        <div class="heart" aria-hidden="true"></div>
+      </div>
+    </div>
+    <!-- 3 -->
+    <div class="env">
+      <div class="inner">
+        <div class="panel"></div>
+        <div class="flap"></div>
+        <div class="letter"><div class="text">🌙 Ohne dich wäre alles halb so schön.</div></div>
+        <div class="heart" aria-hidden="true"></div>
+      </div>
+    </div>
+    <!-- 4 -->
+    <div class="env">
+      <div class="inner">
+        <div class="panel"></div>
+        <div class="flap"></div>
+        <div class="letter"><div class="text">⭐ Du machst jeden Tag besser!</div></div>
+        <div class="heart" aria-hidden="true"></div>
+      </div>
+    </div>
+    <!-- 5 -->
+    <div class="env">
+      <div class="inner">
+        <div class="panel"></div>
+        <div class="flap"></div>
+        <div class="letter"><div class="text">🫶 Ich bin froh, dass es dich gibt!</div></div>
+        <div class="heart" aria-hidden="true"></div>
+      </div>
     </div>
   </div>
 
-<script>
-  // Score nur aus DIESER Sitzung (jede Runde neu erspielen)
-  const score = parseInt(sessionStorage.getItem("bananaScore") || "0");
+  <div class="row">
+    <a href="index.html" class="back">⬅ Zurück</a>
+    <button class="reset" id="reset">Score zurücksetzen</button>
+  </div>
 
-  const envs = Array.from(document.querySelectorAll("#letters-app .env"));
-  const meta = document.getElementById("meta");
+<script>
+  // Score aus Banana-Game (SessionStorage)
+  const score = parseInt(sessionStorage.getItem("bananaScore") || "0");
+  const envs  = Array.from(document.querySelectorAll(".env"));
+  const meta  = document.getElementById("meta");
   meta.textContent = `Freigeschaltet: ${Math.min(score, envs.length)} / ${envs.length}`;
 
+  // Freigabe nach Score
   envs.forEach((env, i) => {
-    if (i >= score) {
-      env.classList.add("disabled");
-      return;
-    }
+    if (i >= score) { env.classList.add("disabled"); return; }
+
     env.addEventListener("click", () => {
-      // Reihenfolge hart erzwingen
-      if (env.classList.contains("open-step3")) {
-        env.classList.remove("open-step1","open-step2","open-step3");
+      // schon offen -> wieder schließen
+      if (env.classList.contains("open-s3")) {
+        env.classList.remove("open-s1","open-s2","open-s3");
         return;
       }
-      env.classList.add("open-step1");
-      setTimeout(()=>env.classList.add("open-step2"), 300);  // Herz
-      setTimeout(()=>env.classList.add("open-step3"), 700);  // Brief
+      // Sequenz hart erzwingen
+      env.classList.add("open-s1");                 // Klappe sofort
+      setTimeout(()=>env.classList.add("open-s2"), 300);  // Herz
+      setTimeout(()=>env.classList.add("open-s3"), 700);  // Brief (overflow sichtbar)
     });
   });
 
