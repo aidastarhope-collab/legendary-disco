@@ -1,6 +1,6 @@
 <script>
-  // Anzahl freigeschalteter Briefe aus localStorage holen
-  let unlocked = localStorage.getItem("bananaScore") || 0;
+  // Lokalen Score nur aus dieser Session lesen
+  let unlocked = sessionStorage.getItem("bananaScore") || 0;
   unlocked = parseInt(unlocked);
 
   function toggle(el) {
@@ -8,7 +8,6 @@
     c.style.display = c.style.display === 'block' ? 'none' : 'block';
   }
 
-  // Alle Briefe einschränken
   document.querySelectorAll(".letter").forEach((el, idx) => {
     if(idx >= unlocked){
       el.style.pointerEvents="none";
