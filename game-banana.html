@@ -20,7 +20,7 @@ canvas{background:#fde68a;border:2px solid #f59e0b;margin-top:20px;}
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
 const player={x:180,y:360,w:40,h:20};
 let hearts=[],score=0,gameOver=false;
-let timeLeft=10;
+let timeLeft=20;
 const nextBtn=document.getElementById("nextBtn");
 
 function spawnHeart(){if(!gameOver) hearts.push({x:Math.random()*360,y:0});}
@@ -73,4 +73,5 @@ loop();
 </script>
 </body>
 </html>
+
 
