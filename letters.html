@@ -1,5 +1,5 @@
 <script>
-  // Lokalen Score nur aus dieser Session lesen
+  // Anzahl freigeschalteter Briefe aus der aktuellen Session holen
   let unlocked = sessionStorage.getItem("bananaScore") || 0;
   unlocked = parseInt(unlocked);
 
@@ -8,6 +8,7 @@
     c.style.display = c.style.display === 'block' ? 'none' : 'block';
   }
 
+  // Briefe entsprechend freischalten
   document.querySelectorAll(".letter").forEach((el, idx) => {
     if(idx >= unlocked){
       el.style.pointerEvents="none";
