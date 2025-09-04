@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Maze</title>
+  <style>
+    body{background:#f0fdf4;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;}
+    canvas{background:white;border:2px solid black;}
+    a{margin-top:20px;}
+  </style>
+</head>
+<body>
+  <h1>🌀 Maze</h1>
+  <canvas id="maze" width="300" height="300"></canvas>
+  <a href="index.html">⬅️ Zurück</a>
+
+  <script>
+    const canvas=document.getElementById("maze"),ctx=canvas.getContext("2d");
+    const player={x:10,y:10,size:20};
+    const goal={x:260,y:260,size:20};
+    const walls=[[60,0,20,200],[120,100,20,200],[180,0,20,200]];
+    function draw(){
+      ctx.clearRect(0,0,300,300);
+      ctx.fillStyle="green"; ctx.fillRect(goal.x,goal.y,goal.size,goal.size);
+      ctx.fillStyle="blue"; ctx.fillRect(player.x,player.y,player.size,player.size);
+      ctx.fillStyle="black"; walls.forEach(w=>ctx.fillRect(...w));
+    }
+    function collide(nx,ny){
+      return walls.some(([x,y,w,h])=>nx< x+w && nx+player.size> x && ny< y+h && ny+player.size> y);
+    }
+    document.addEventListener("keydown",e=>{
+      let nx=player.x,ny=player.y;
+      if(e.key==="ArrowUp")ny-=20;
+      if(e.key==="ArrowDown")ny+=20;
+      if(e.key==="ArrowLeft")nx-=20;
+      if(e.key==="ArrowRight")nx+=20;
+      if(nx>=0&&ny>=0&&nx<=280&&ny<=280&&!collide(nx,ny)){player.x=nx;player.y=ny;}
+      if(player.x===goal.x&&player.y===goal.y) alert("🎉 Du hast das Ziel erreicht!");
+      draw();
+    });
+    draw();
+  </script>
+</body>
+</html>
