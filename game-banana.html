@@ -81,7 +81,7 @@
         gameOver = true;
         clearInterval(timer);
         // Score speichern
-        localStorage.setItem("bananaScore", score);
+        sessionStorage.setItem("bananaScore", score);
         // Button anzeigen
         nextBtn.style.display="inline-block";
       }
@@ -92,3 +92,4 @@
   </script>
 </body>
 </html>
+
