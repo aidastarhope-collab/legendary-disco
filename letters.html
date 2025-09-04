@@ -1,18 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Briefe 💌</title>
+<style>
+body { font-family: Arial, sans-serif; background:#fef3c7; text-align:center; padding:30px; }
+.letter { display:inline-block; background:white; padding:20px; margin:15px; border:2px solid #f59e0b; border-radius:10px; cursor:pointer; width:200px; }
+.content { display:none; margin-top:15px; }
+a { display:block; margin-top:30px; }
+</style>
+</head>
+<body>
+<h1>📜 Briefe für dich</h1>
+
+<div class="letter">Brief 1
+  <div class="content">💜 Du bist der Beste!</div>
+</div>
+<div class="letter">Brief 2
+  <div class="content">😂 Danke für all unsere Memes!</div>
+</div>
+<div class="letter">Brief 3
+  <div class="content">🫶 Ohne dich wäre vieles halb so lustig.</div>
+</div>
+<div class="letter">Brief 4
+  <div class="content">⭐ Du machst jeden Tag besser!</div>
+</div>
+
+<a href="index.html">⬅️ Zurück</a>
+
 <script>
-  // Anzahl freigeschalteter Briefe aus der aktuellen Session holen
-  let unlocked = sessionStorage.getItem("bananaScore") || 0;
-  unlocked = parseInt(unlocked);
+let unlocked = sessionStorage.getItem("bananaScore") || 0;
+unlocked = parseInt(unlocked);
 
-  function toggle(el) {
-    let c = el.querySelector('.content');
-    c.style.display = c.style.display === 'block' ? 'none' : 'block';
+const letters = document.querySelectorAll(".letter");
+letters.forEach((el, idx)=>{
+  if(idx >= unlocked){
+    el.style.pointerEvents="none";
+    el.style.opacity="0.4";
   }
+});
 
-  // Briefe entsprechend freischalten
-  document.querySelectorAll(".letter").forEach((el, idx) => {
-    if(idx >= unlocked){
-      el.style.pointerEvents="none";
-      el.style.opacity="0.4";
-    }
-  });
+function toggle(el){
+  const content = el.querySelector(".content");
+  if(content) content.style.display = content.style.display === "block" ? "none" : "block";
+}
+
+letters.forEach(el=>el.addEventListener("click",()=>toggle(el)));
 </script>
+</body>
+</html>
