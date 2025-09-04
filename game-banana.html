@@ -1,19 +1,33 @@
 <script>
   const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
   const player={x:180,y:360,w:40,h:20};
-  let hearts=[],score=0;
+  let hearts=[],score=0, gameOver=false;
+  let timeLeft = 20; // Sekunden Spielzeit
 
   function spawnHeart(){
-    hearts.push({x:Math.random()*360,y:0});
+    if(!gameOver) hearts.push({x:Math.random()*360,y:0});
   }
   function draw(){
     ctx.clearRect(0,0,400,400);
     ctx.fillStyle="yellow";ctx.fillRect(player.x,player.y,player.w,player.h);
+
     ctx.fillStyle="red";
     hearts.forEach(h=>ctx.fillText("❤️",h.x,h.y));
-    ctx.fillStyle="black";ctx.fillText("Score: "+score,10,20);
+
+    ctx.fillStyle="black";
+    ctx.font="16px Arial";
+    ctx.fillText("Score: "+score,10,20);
+    ctx.fillText("Zeit: "+timeLeft+"s",320,20);
+
+    if(gameOver){
+      ctx.fillStyle="black";
+      ctx.font="24px Arial";
+      ctx.fillText("⏳ Zeit abgelaufen!", 100,200);
+      ctx.fillText("Endscore: "+score, 120,240);
+    }
   }
   function update(){
+    if(gameOver) return;
     hearts.forEach(h=>h.y+=2);
     hearts=hearts.filter(h=>{
       if(h.y>400)return false;
@@ -28,10 +42,17 @@
     if(e.key==="ArrowRight")player.x=Math.min(360,player.x+20);
   });
 
-  // Save score when leaving page
-  window.addEventListener("beforeunload", ()=>{
-    localStorage.setItem("bananaScore", score);
-  });
+  // Timer runterzählen
+  let timer = setInterval(()=>{
+    if(timeLeft>0){
+      timeLeft--;
+    } else {
+      gameOver = true;
+      clearInterval(timer);
+      // Score speichern
+      localStorage.setItem("bananaScore", score);
+    }
+  },1000);
 
   setInterval(spawnHeart,1000); 
   loop();
