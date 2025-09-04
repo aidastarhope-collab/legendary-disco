@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Briefe 💌</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#fef3c7; text-align:center; padding:30px; }
+    .letter {
+      display:inline-block; background:white; padding:20px; margin:15px;
+      border:2px solid #f59e0b; border-radius:10px; cursor:pointer; width:200px;
+    }
+    .content { display:none; margin-top:15px; }
+    a { display:block; margin-top:30px; }
+  </style>
+</head>
+<body>
+  <h1>📜 Briefe für dich</h1>
+  <div class="letter" onclick="toggle(this)">Brief 1
+    <div class="content">💜 Du bist der Beste!</div>
+  </div>
+  <div class="letter" onclick="toggle(this)">Brief 2
+    <div class="content">😂 Danke für all unsere Memes!</div>
+  </div>
+  <div class="letter" onclick="toggle(this)">Brief 3
+    <div class="content">🫶 Ohne dich wäre vieles halb so lustig.</div>
+  </div>
+  <a href="index.html">⬅️ Zurück</a>
+
+  <script>
+    function toggle(el) {
+      let c = el.querySelector('.content');
+      c.style.display = c.style.display === 'block' ? 'none' : 'block';
+    }
+  </script>
+</body>
+</html>
